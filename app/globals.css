@@ -1,26 +1,91 @@
 @import "tailwindcss";
 
+/* Dark mode is driven by an explicit class on <html>, set before paint by the
+   inline script in app/layout.tsx. That script seeds the class from
+   localStorage, falling back to the OS preference, so "system" still works. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --surface: #fafafa;
+  --surface-raised: #ffffff;
+  --border: #e4e4e7;
+  --foreground: #18181b;
+  --muted-foreground: #52525b;
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-foreground: #ffffff;
+  --accent-soft: #eff6ff;
+  --accent-soft-foreground: #1e40af;
+  --ring: #1d4ed8;
+}
+
+.dark {
+  --background: #09090b;
+  --surface: #131316;
+  --surface-raised: #18181b;
+  --border: #27272a;
+  --foreground: #fafafa;
+  --muted-foreground: #a1a1aa;
+  --accent: #60a5fa;
+  --accent-hover: #93c5fd;
+  --accent-foreground: #09090b;
+  --accent-soft: #172554;
+  --accent-soft-foreground: #bfdbfe;
+  --ring: #60a5fa;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
   --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-foreground: var(--accent-soft-foreground);
+  --color-ring: var(--ring);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  /* Clears the sticky header when jumping to an anchor. */
+  scroll-padding-top: 5rem;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
