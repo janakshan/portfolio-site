@@ -4,8 +4,9 @@ Freelance portfolio for Janakshan Krishnamoorthy — a single scrolling homepage
 plus one case-study page per project.
 
 Built with Next.js 16 (App Router), React 19, Tailwind CSS v4 and TypeScript.
-**Zero runtime dependencies beyond Next and React** — no icon library, no theme
-library, no animation library. Everything renders as static HTML.
+**Zero runtime dependencies beyond Next, React and `@vercel/analytics`** — no
+icon library, no theme library, no animation library. Everything renders as
+static HTML.
 
 ```bash
 npm run dev      # http://localhost:3000
