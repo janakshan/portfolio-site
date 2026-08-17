@@ -3,9 +3,10 @@ import type { Project } from "./types";
 /**
  * The three demo projects from freelance-business/04-portfolio/.
  *
- * All three are `status: "placeholder"` until they actually exist. A placeholder
- * renders as a card with no outbound link and is excluded from the case-study
- * routes, so nothing on the site ever points at something that isn't there.
+ * Trueline is built and `published`. BookBoard and FieldNote stay
+ * `status: "placeholder"` until they actually exist — a placeholder renders as a
+ * card with no outbound link and is excluded from the case-study routes, so
+ * nothing on the site ever points at something that isn't there.
  *
  * ── To publish one ──────────────────────────────────────────────────────────
  * 1. Fill `result` with numbers you actually measured. No estimates.
@@ -20,42 +21,68 @@ import type { Project } from "./types";
  */
 export const projects: Project[] = [
   {
-    slug: "docudata",
-    name: "DocuData",
-    outcome: "Turning document piles into clean data with AI",
+    slug: "trueline",
+    name: "Trueline",
+    outcome: "Turning document piles into clean data, with a human in the loop",
     type: "Demo project — built to demonstrate my approach",
-    role: "Design, development, deployment (solo)",
-    timeline: "~1 week, part-time",
-    status: "placeholder",
+    role: "Design and development (solo)",
+    timeline: "1 day (~5 hours), solo",
+    status: "published",
+    // Going live at trueline.janakshan.dev: uncomment the line below once the
+    // deploy actually resolves, and add "deployment" back to `role`. Until then
+    // the page shows "View code" only — a dead "View live demo" link costs more
+    // trust than a missing one.
+    // liveUrl: "https://trueline.janakshan.dev",
+    codeUrl: "https://github.com/janakshan/trueline",
     teaser:
-      "Businesses retype invoices and receipts into spreadsheets by hand. This reads them instead — a person confirms the result in seconds, then exports it clean.",
-    tags: ["Next.js", "Claude API", "PostgreSQL", "AI extraction"],
+      "Businesses retype invoices and receipts into spreadsheets by hand. This reads them instead, points out the numbers that do not add up, and lets a person confirm the result in seconds before exporting it clean.",
+    tags: ["Next.js", "Claude API", "PostgreSQL", "AI extraction", "Human-in-the-loop"],
     problem: [
-      "Small businesses receive invoices, receipts and forms as PDFs and photos. Someone has to retype every one of them into a spreadsheet.",
-      "It is slow, nobody enjoys it, and the mistakes only surface later — in the accounts.",
+      "Small businesses receive invoices and receipts as PDFs and phone photos. Someone has to retype every one of them into a spreadsheet.",
+      "It is slow, nobody enjoys it, and the mistakes only surface later — in the accounts, where they cost real money.",
     ],
     approach: [
-      "Upload a document, and it comes back as structured data: vendor, date, line items, totals, currency.",
-      "AI extraction is never 100% right, so I designed a human review step — the extracted fields sit beside the original document, editable, with the uncertain ones flagged. The AI does the boring work; a person confirms it in seconds.",
-      "Bad AI output can never reach the database. Malformed responses get one retry, then the document is marked \"needs manual review\" rather than saved as junk.",
-      "Deliberately not built: teams and roles, billing, third-party integrations, a mobile app. It is a demo of one idea, and scope discipline is the point.",
+      "Upload a document and it comes back as structured data: supplier, dates, line items, tax and totals. Check it, then export a batch to CSV.",
+      "AI extraction is never completely right, so the review step is the product rather than an afterthought. The extracted fields sit beside the original document, editable, and the app checks the sums itself: when the line items do not add up to the printed subtotal, it says so in plain words and shows the exact difference.",
+      "The key decision was to tell the AI to copy what the document says and never to correct it. That sounds backwards until you follow it through — if the AI quietly fixes a wrong total, nobody ever learns the document was wrong. Copying it exactly is what lets the arithmetic check catch it.",
+      "Only genuinely uncertain fields are flagged, because if everything is highlighted people stop looking. Nothing is ever approved automatically, and nothing the AI returns is saved until it has been checked.",
+      "Deliberately not built: teams and roles, billing, accounting integrations, a mobile app. One idea done properly is worth more than five half-finished ones, and knowing where to stop is part of the job.",
     ],
     result: [
-      // TODO after building: processing time per document, accuracy on your own
-      // test set, number of sample documents tested. Measured figures only.
+      "Tested against the real Claude API on four sample documents: 6–7 seconds and roughly two US cents per single-page document.",
+      "The arithmetic check does its job on a document built to break it — the AI reported the printed subtotal of £1,420.00 while the line items came to £1,240.00, and the app flagged the £180.00 gap instead of silently choosing one. An unclear date (03/04/2026) is left blank and flagged rather than guessed.",
+      "170 automated checks across four suites, all passing: the extraction pipeline, sign-in, every API route, and a full upload-to-export run.",
+      "Honest limits: this is a demo built to show the approach. Four sample documents demonstrate the workflow rather than an accuracy benchmark, and the cost figure is measured on single-page files — a dense multi-page scan will cost more.",
     ],
     tech: {
       stack:
-        "Next.js (App Router) · TypeScript · Tailwind · PostgreSQL (Neon) · Claude API · Vercel",
+        "Next.js 15 (App Router) · React 19 · TypeScript · Tailwind v4 · PostgreSQL 16 with Drizzle · Zod · Claude API",
       architecture:
-        "Next.js API routes handle upload, extraction and export. Documents go to object storage; extractions are stored as validated JSON against a fixed schema, keyed to the document record.",
+        "API routes handle upload, extraction and export. Files go to storage behind a swappable interface; the pipeline claims a document, calls Claude with a structured-output schema, parses and validates the reply, then writes the extraction and its flags in one transaction. Every successful extraction lands on \"needs review\" — only a person moves it to approved.",
       interestingBits: [
-        "The extraction prompt lives in its own file so it can be tuned without touching application code.",
-        "Per-field confidence is stored where the model expresses uncertainty, which is what drives the review screen's flagging.",
-        "Extracted text is untrusted input and is escaped on render — AI output is a real XSS vector that is easy to forget.",
+        "One Zod schema does four jobs: it defines the fields, generates the JSON Schema sent to the model, validates the reply at runtime, and gives the stored data its TypeScript type — so the field list cannot drift out of sync with itself.",
+        "Failures are split into retryable and permanent. A malformed reply gets one repair attempt that names the offending fields; a bad API key gets none, because retrying a permanent failure just burns the budget.",
+        "The database enforces its own invariants — generated columns and a partial unique index guarantee exactly one current extraction per document, rather than trusting the application to remember.",
       ],
     },
-    screenshots: [],
+    screenshots: [
+      {
+        src: "/projects/trueline/documents.png",
+        alt: "Document list showing five invoices with status labels and flag counts",
+        caption:
+          "Every document's status at a glance, with a count of the fields that want a human.",
+        width: 1440,
+        height: 560,
+      },
+      {
+        src: "/projects/trueline/review.png",
+        alt: "Extracted invoice amounts with the subtotal flagged, above a message reading: line items total 1,240.00 but subtotal reads 1,420.00 — 180.00 difference",
+        caption:
+          "The review step. The app spotted that the line items total £1,240.00 while the subtotal reads £1,420.00, and shows the £180.00 difference instead of quietly picking a side.",
+        width: 808,
+        height: 315,
+      },
+    ],
   },
   {
     slug: "bookboard",
