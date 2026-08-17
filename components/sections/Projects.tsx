@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Card, Pill } from "@/components/ui/Card";
+import { cn } from "@/lib/cn";
 import { projects } from "@/content/projects";
 import type { Project } from "@/content/types";
 
@@ -8,7 +9,18 @@ function ProjectCard({ project }: { project: Project }) {
   const isPublished = project.status === "published";
 
   return (
-    <Card className="flex h-full flex-col">
+    /* Published cards are clickable across their whole surface. The anchor
+       stays a single real link and stretches over the card with `after:inset-0`
+       rather than wrapping everything — nesting the tags and heading inside an
+       <a> would give screen readers one enormous link label. The ring lives on
+       the card via focus-within so keyboard focus outlines the whole tile. */
+    <Card
+      className={cn(
+        "flex h-full flex-col",
+        isPublished &&
+          "relative transition-colors hover:border-accent focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-4 focus-within:ring-offset-background",
+      )}
+    >
       {/* A caption rather than a pill: the label is a full sentence and wrapped
           to two lines inside a rounded-full pill, which read as broken. */}
       <p className="flex gap-2 text-xs leading-relaxed font-medium text-accent">
@@ -39,7 +51,7 @@ function ProjectCard({ project }: { project: Project }) {
         {isPublished ? (
           <Link
             href={`/projects/${project.slug}`}
-            className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+            className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-none after:absolute after:inset-0 after:rounded-xl"
           >
             Read the case study
             <span aria-hidden="true">→</span>

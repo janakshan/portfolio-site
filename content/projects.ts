@@ -25,14 +25,10 @@ export const projects: Project[] = [
     name: "Trueline",
     outcome: "Turning document piles into clean data, with a human in the loop",
     type: "Demo project — built to demonstrate my approach",
-    role: "Design and development (solo)",
+    role: "Design, development, deployment (solo)",
     timeline: "1 day (~5 hours), solo",
     status: "published",
-    // Going live at trueline.janakshan.dev: uncomment the line below once the
-    // deploy actually resolves, and add "deployment" back to `role`. Until then
-    // the page shows "View code" only — a dead "View live demo" link costs more
-    // trust than a missing one.
-    // liveUrl: "https://trueline.janakshan.dev",
+    liveUrl: "https://trueline.janakshan.dev",
     codeUrl: "https://github.com/janakshan/trueline",
     teaser:
       "Businesses retype invoices and receipts into spreadsheets by hand. This reads them instead, points out the numbers that do not add up, and lets a person confirm the result in seconds before exporting it clean.",
